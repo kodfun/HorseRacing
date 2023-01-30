@@ -1,0 +1,104 @@
+<div class="kodfun">
+  <img src="horse1.gif" alt="Karayel">
+  <img src="horse2.gif" alt="Bold Pilot">
+  <img src="horse3.gif" alt="Toraman">
+  <button>START</button>
+  <div class="result"></div>
+</div>
+
+<style>
+  body {
+    background-color: #F28B0C;
+  }
+
+  .kodfun {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background-color: darkgreen;
+    padding: 16px;
+    position: relative;
+  }
+
+  .kodfun>img {
+    width: 8rem;
+    height: 5rem;
+    z-index: 99;
+  }
+
+  .result {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    background-color: darkred;
+    padding: 1rem;
+    font-size: 2rem;
+    z-index: 100;
+  }
+
+  .kodfun::before {
+    content: "";
+    display: block;
+    width: 0;
+    height: 17rem;
+    border-right: 8px dashed white;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+</style>
+
+<script>
+  let track = document.querySelector(".kodfun");
+  let result = document.querySelector(".result");
+  const horses = [...document.querySelectorAll(".kodfun>img")];
+  let pos = horses.map(h => 0);
+  const btn = document.querySelector(".kodfun>button");
+  const rand = () => Math.random() * 10;
+  let timerId = null;
+
+  function start() {
+    if (timerId < 0) {
+      result.style.display = "none";
+      pos.fill(0);
+      for (const h of horses) 
+        h.style.marginLeft = "0px";
+      btn.textContent = "START";
+      timerId = null;
+    }
+    else if (timerId) {
+      clearInterval(timerId);
+      timerId = null;
+      btn.textContent = "CONTINUE";
+    }
+    else {
+      timerId = setInterval(go, 100);
+      btn.textContent = "PAUSE";
+    }
+  }
+
+  function go() {
+    let max = -1;
+    let winner = null;
+    for (const i in horses) {
+      horses[i].style.marginLeft = (pos[i] += rand()) + "px";
+      if (pos[i] > max) {
+        max = pos[i];
+        winner = horses[i];
+      }
+    }
+
+    if (max > track.offsetWidth - (32 + horses[0].offsetWidth)) {
+      start();
+      result.style.display = "block";
+      result.textContent = "The champion is " + winner.alt;
+      btn.textContent = "RESTART";
+      timerId = -1;
+    }
+  }
+
+  btn.onclick = start;
+</script>
